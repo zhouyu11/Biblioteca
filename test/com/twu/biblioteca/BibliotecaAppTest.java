@@ -9,8 +9,11 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class BibliotecaAppTest {
+
+    private Movie movie;
 
     @Test
     public void testWelcome(){
@@ -39,8 +42,8 @@ public class BibliotecaAppTest {
 
     @Test
     public void testDoOptionGetBookList(){
-        String message = BibliotecaApp.doOption(1);
-        assertEquals("get booklist sucess !",message);
+        String message = BibliotecaApp.doGetBookList();
+        assertEquals("sucess",message);
     }
 
     @Test
@@ -115,6 +118,74 @@ public class BibliotecaAppTest {
         BibliotecaApp.IConsoleReader = new FakeConsoleReader("book1");
         String message = BibliotecaApp.doOption(4);
         assertEquals("That is not a valid book to return.",message);
+    }
+
+    @Test
+    public void testGetMovies(){
+        Movie movie = new Movie("movieName", Year.of(2015), "Ben", 8);
+        MovieLibrary movieLibrary = new MovieLibrary(Arrays.asList(movie));
+        List<Movie> movieList = movieLibrary.getMoviesList();
+        Movie actualMovie = movieList.get(0);
+
+        assertEquals(actualMovie.getDirector(),movie.getDirector());
+        assertEquals(actualMovie.getName(),movie.getName());
+        assertEquals(actualMovie.getYear(),movie.getYear());
+        assertEquals(actualMovie.getRete(), movie.getRete());
+    }
+
+    @Test
+    public void testOptionGetMovies(){
+        String message = BibliotecaApp.doGetMoviesList();
+        assertEquals("sucess",message);
+    }
+
+    @Test
+    public void testCheckoutMovie(){
+        Movie movie = new Movie("movieName", Year.of(2015), "Ben", 8);
+        MovieLibrary movieLibrary = new MovieLibrary(Arrays.asList(movie));
+
+        String message = movieLibrary.checkout("movieName");
+        assertEquals("Thank you! Enjoy the movie",message);
+    }
+
+    @Test
+    public void testCheckoutInvalidMovie(){
+        Movie movie = new Movie("movieName", Year.of(2015), "Ben", 8);
+        MovieLibrary movieLibrary = new MovieLibrary(Arrays.asList(movie));
+
+        String message = movieLibrary.checkout("invalidMovieName");
+        assertEquals("That movie is not available",message);
+    }
+
+    @Test
+    public void testDoCheckoutMovie(){
+        Movie movie = new Movie("movieName", Year.of(2015), "Ben", 8);
+        BibliotecaApp.movieLibrary= new MovieLibrary(Arrays.asList(movie));
+        BibliotecaApp.IConsoleReader = new FakeConsoleReader("movieName");
+
+        String optionMessage = BibliotecaApp.doOption(6);
+        assertEquals("Thank you! Enjoy the movie",optionMessage);
+    }
+    @Test
+    public void testLogIn(){
+        String userName = "yzhou";
+        String passWord = "P@ss123";
+        CurrentUser currentUser = new CurrentUser(userName,passWord);
+        BibliotecaAppUser bibliotecaAppUser = new BibliotecaAppUser(userName, passWord, "qq@qq.com", "17066552351");
+
+        assertTrue(new UserService(Arrays.asList(bibliotecaAppUser)).logIn(currentUser));
+    }
+
+    @Test
+    public void testGetUserInfor(){
+        BibliotecaAppUser bibliotecaAppUser = new BibliotecaAppUser("yzhou", "password", "qq@qq.com", "17066552351");
+        UserService userService =new UserService(Arrays.asList(bibliotecaAppUser));
+        List<BibliotecaAppUser> users = userService.getUsers();
+
+        BibliotecaAppUser actualUser = users.get(0);
+        assertEquals(bibliotecaAppUser.getName(), actualUser.getName());
+        assertEquals(bibliotecaAppUser.getEmailAddress(), actualUser.getEmailAddress());
+        assertEquals(bibliotecaAppUser.getPhoneNumber(), actualUser.getPhoneNumber());
     }
 
 }
